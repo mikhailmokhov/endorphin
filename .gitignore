@@ -1,0 +1,16 @@
+.DS_Store
+.dart_tool/
+.flutter-plugins
+
+.packages
+.pub/
+
+build/
+ios/
+android/
+
+.flutter-plugins
+.metadata
+endorphin.iml
+endorphin_android.iml
+pubspec.lock
