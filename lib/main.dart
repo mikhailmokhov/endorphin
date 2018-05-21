@@ -3,7 +3,7 @@ import 'package:endorphin/settings-page.dart';
 import 'package:endorphin/running-page.dart';
 import 'package:flutter/material.dart';
 import 'package:endorphin/main-theme.dart';
-import 'package:geolocation/geolocation.dart';
+import 'package:endorphin/location-tracking.dart';
 
 void main() => runApp(new MyApp());
 
@@ -52,12 +52,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _startRun() {
 
-//    Geolocation.currentLocation(accuracy: LocationAccuracy.best).listen((result) {
-//      if(result.isSuccessful) {
-//        var latitude = result.location.latitude;
-//
-//      }
-//    });
+    locationTracking.startRecordingLocation();
+
 
     Navigator.push(
         context,
