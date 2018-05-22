@@ -3,6 +3,8 @@ import 'package:endorphin/settings-page.dart';
 import 'package:endorphin/timer-text-widget.dart';
 import 'dart:async';
 import 'package:endorphin/main.dart';
+import 'package:endorphin/location-tracking.dart';
+import 'package:endorphin/distance-text-widget.dart';
 
 bool paused = false;
 Color statColor = Colors.black;
@@ -64,6 +66,8 @@ class _RunningPageState extends State<RunningPage> {
             new FlatButton(
               child: new Text('Yes', style: new TextStyle(fontSize: 25.0)),
               onPressed: () {
+
+                locationTracking.stopRecordingLocation();
                 Navigator.of(context).pop();
                 Navigator.push(
                     context,
@@ -96,30 +100,13 @@ class _RunningPageState extends State<RunningPage> {
                   onPressed: _openSettings, icon: new Icon(Icons.settings))
             ]),
         body: new Container(
-            padding: const EdgeInsets.all(22.0),
             child: new Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   new Expanded(
                       child: new Column(children: [
                     new TimerText(),
-                    new Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          new Padding(
-                              padding: new EdgeInsets.only(left: 5.0),
-                              child: new Text("5",
-                                  style: new TextStyle(
-                                      fontSize: 36.0, color: statColor))),
-                          new Text("km", style: new TextStyle(fontSize: 23.0, height: 1.6, color: statColor)),
-                          new Padding(
-                              padding: new EdgeInsets.only(left: 9.0),
-                              child: new Text("350",
-                                  style: new TextStyle(
-                                      fontSize: 36.0, color: statColor))),
-                          new Text("m", style: new TextStyle(fontSize: 23.0, height: 1.6, color: statColor))
-                        ])
-                  ])),
+                    new DistanceText()                  ])),
                   new Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -128,17 +115,19 @@ class _RunningPageState extends State<RunningPage> {
                               onPressed: _pause,
                               icon: new Icon(_pauseButtonIcon),
                               label: new Text(_pauseButtonLabel,
-                                  style: new TextStyle(fontSize: 26.0)))),
+                                  style: new TextStyle(fontSize: 23.0)))),
                       new Expanded(
                           child: new FlatButton.icon(
+
                               onPressed: _neverSatisfied,
                               icon: new Icon(Icons.flag),
                               label: new Text("Finish",
-                                  style: new TextStyle(fontSize: 26.0))))
+                                  style: new TextStyle(fontSize: 23.0))))
                     ],
                   )
                 ])));
   }
 }
+
 
 

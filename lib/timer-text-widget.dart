@@ -25,9 +25,9 @@ class _TimerTextState extends State<TimerText> {
   @override
   Widget build(BuildContext context) {
     TextStyle hoursMinutesTextStyle =
-        new TextStyle(fontSize: 92.0, color: statColor);
+        new TextStyle(fontSize: 90.0, color: statColor);
     TextStyle secondsTextStyle =
-        new TextStyle(fontSize: 52.0, color: statColor, height: 1.9);
+        new TextStyle(fontSize: 50.0, color: statColor, height: 1.9);
     String hoursMinutes =
         TimerTextFormatter.getHoursMinutes(stopwatch.elapsedMilliseconds);
     String seconds =
