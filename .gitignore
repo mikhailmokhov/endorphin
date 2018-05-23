@@ -7,7 +7,11 @@
 .pub/
 
 build/
-ios/
+!ios
+ios/*
+!ios/Runner
+ios/Runner/*
+!ios/Runner/Info.plist
 android/
 
 .flutter-plugins
@@ -15,6 +19,3 @@ android/
 endorphin.iml
 endorphin_android.iml
 pubspec.lock
-
-#exception for ios app setting file
-!ios/Runner/Info.plist
