@@ -6,7 +6,6 @@ import 'package:endorphin/main.dart';
 import 'package:endorphin/location-tracking.dart';
 import 'package:endorphin/distance-text-widget.dart';
 
-bool paused = false;
 Color statColor = Colors.black;
 Stopwatch stopwatch = new Stopwatch();
 
@@ -21,6 +20,7 @@ class _RunningPageState extends State<RunningPage> {
   var _pauseButtonLabel = "Pause";
   var _pauseButtonIcon = Icons.pause;
   var _title = "Running";
+  bool paused = false;
 
   _RunningPageState() {
     stopwatch.reset();
@@ -35,7 +35,6 @@ class _RunningPageState extends State<RunningPage> {
                 new SettingsPage(title: "Settings")));
   }
 
-
   void _pause() {
     setState(() {
       paused = !paused;
@@ -45,12 +44,14 @@ class _RunningPageState extends State<RunningPage> {
         _pauseButtonLabel = "Resume";
         _pauseButtonIcon = Icons.play_arrow;
         stopwatch.stop();
+        locationTracking.trackDistance = false;
       } else {
         statColor = Colors.black;
         _title = "Running";
         _pauseButtonIcon = Icons.pause;
         _pauseButtonLabel = "Pause";
         stopwatch.start();
+        locationTracking.trackDistance = true;
       }
     });
   }
@@ -61,13 +62,13 @@ class _RunningPageState extends State<RunningPage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return new AlertDialog(
-          title: new Text('Finish this run?',style: new TextStyle(fontSize: 25.0)),
+          title: new Text('Finish this run?',
+              style: new TextStyle(fontSize: 25.0)),
           actions: <Widget>[
             new FlatButton(
               child: new Text('Yes', style: new TextStyle(fontSize: 25.0)),
               onPressed: () {
-
-                locationTracking.stopRecordingLocation();
+                locationTracking.trackDistance = false;
                 Navigator.of(context).pop();
                 Navigator.push(
                     context,
@@ -103,31 +104,32 @@ class _RunningPageState extends State<RunningPage> {
             child: new Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+              new Expanded(
+                  child: new Column(children: [
+                new Padding(
+                    padding: new EdgeInsets.only(top: 5.0, left: 15.0),
+                    child: new TimerText()),
+                new Padding(
+                    padding: new EdgeInsets.only(left: 17.0),
+                    child: new DistanceText())
+              ])),
+              new Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
                   new Expanded(
-                      child: new Column(children: [
-                    new TimerText(),
-                    new DistanceText()                  ])),
-                  new Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      new Expanded(
-                          child: new FlatButton.icon(
-                              onPressed: _pause,
-                              icon: new Icon(_pauseButtonIcon),
-                              label: new Text(_pauseButtonLabel,
-                                  style: new TextStyle(fontSize: 23.0)))),
-                      new Expanded(
-                          child: new FlatButton.icon(
-
-                              onPressed: _neverSatisfied,
-                              icon: new Icon(Icons.flag),
-                              label: new Text("Finish",
-                                  style: new TextStyle(fontSize: 23.0))))
-                    ],
-                  )
-                ])));
+                      child: new FlatButton.icon(
+                          onPressed: _pause,
+                          icon: new Icon(_pauseButtonIcon),
+                          label: new Text(_pauseButtonLabel,
+                              style: new TextStyle(fontSize: 23.0)))),
+                  new Expanded(
+                      child: new FlatButton.icon(
+                          onPressed: _neverSatisfied,
+                          icon: new Icon(Icons.flag),
+                          label: new Text("Finish",
+                              style: new TextStyle(fontSize: 23.0))))
+                ],
+              )
+            ])));
   }
 }
-
-
-

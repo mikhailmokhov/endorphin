@@ -11,6 +11,9 @@ class TimerText extends StatefulWidget {
 
 class _TimerTextState extends State<TimerText> {
   Timer timer;
+  String hours = '0';
+  String minutes = '00';
+  String seconds = '00';
 
   _TimerTextState() {
     timer = new Timer.periodic(new Duration(milliseconds: 1000), callback);
@@ -18,7 +21,12 @@ class _TimerTextState extends State<TimerText> {
 
   void callback(Timer timer) {
     if (stopwatch.isRunning) {
-      setState(() {});
+      setState(() {
+        int milliseconds = stopwatch.elapsedMilliseconds;
+        hours = (milliseconds / 3600000).truncate().toString();
+        minutes = ((milliseconds / 60000).truncate() % 60).toString().padLeft(2, '0');
+        seconds = ((milliseconds / 1000).truncate() % 60).toString().padLeft(2, '0');
+      });
     }
   }
 
@@ -28,13 +36,9 @@ class _TimerTextState extends State<TimerText> {
         new TextStyle(fontSize: 90.0, color: statColor);
     TextStyle secondsTextStyle =
         new TextStyle(fontSize: 50.0, color: statColor, height: 1.9);
-    String hoursMinutes =
-        TimerTextFormatter.getHoursMinutes(stopwatch.elapsedMilliseconds);
-    String seconds =
-        TimerTextFormatter.getSeconds(stopwatch.elapsedMilliseconds);
     return new Row(children: [
-      new Text(hoursMinutes, style: hoursMinutesTextStyle),
-      new Text(seconds, style: secondsTextStyle)
+      new Text(hours + ":" + minutes, style: hoursMinutesTextStyle),
+      new Text(":" + seconds, style: secondsTextStyle)
     ]);
   }
 }

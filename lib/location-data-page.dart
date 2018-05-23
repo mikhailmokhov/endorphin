@@ -9,15 +9,9 @@ class LocationDataPage extends StatefulWidget {
 
 class _LocationDataState extends State<LocationDataPage> {
 
-  bool _isRecordingLocationData = false;
-
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [
-      new _Header(
-        isRecordingLocationData: _isRecordingLocationData
-      )
-    ];
+    List<Widget> children = [];
 
     children.addAll(ListTile.divideTiles(
       context: context,
@@ -31,20 +25,6 @@ class _LocationDataState extends State<LocationDataPage> {
       body: new ListView(
         children: children,
       ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  _Header({this.isRecordingLocationData});
-
-  final bool isRecordingLocationData;
-
-  @override
-  Widget build(BuildContext context) {
-    return new Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20.0),
-      child: new Text('Is recording: ' + locationTracking.isTracking().toString()),
     );
   }
 }

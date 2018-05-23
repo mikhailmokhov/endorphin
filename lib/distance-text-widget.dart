@@ -16,21 +16,22 @@ class _DistanceTextState extends State<DistanceText> {
   int kilometers = 0;
   int meters = 0;
 
+  _onDistanceChange(distance){
+    setState((){
+      meters = distance.floor();
+      kilometers = (meters/1000).floor();
+      meters = meters - kilometers * 1000;
+    });
+  }
+
   _DistanceTextState() {
-    timer = new Timer.periodic(new Duration(milliseconds: 50), callback);
+    locationTracking.addLocationListener(_onDistanceChange);
   }
-
-  void callback(Timer timer) {
-    if (locationTracking.isTracking()) {
-      setState(() {
-        meters = locationTracking.distance.floor();
-        kilometers = (meters/1000).floor();
-        meters = meters - kilometers * 1000;
-      });
-    }
+  @override
+  dispose(){
+    super.dispose();
+    locationTracking.removeLocationListener(_onDistanceChange);
   }
-
-
 
 
   @override
@@ -49,26 +50,5 @@ class _DistanceTextState extends State<DistanceText> {
       new Text("m",
           style: new TextStyle(fontSize: 23.0, height: 1.6, color: statColor))
     ]);
-  }
-}
-
-class TimerTextFormatter {
-  static String getHoursMinutes(int milliseconds) {
-    int hundreds = (milliseconds / 10).truncate();
-    int seconds = (hundreds / 100).truncate();
-    int minutes = (seconds / 60).truncate();
-    int hours = (minutes / 60).truncate();
-
-    String hoursStr = (hours % 60).toString();
-    String minutesStr = (minutes % 60).toString().padLeft(2, '0');
-
-    return "$hoursStr:$minutesStr";
-  }
-
-  static String getSeconds(int milliseconds) {
-    int hundreds = (milliseconds / 10).truncate();
-    int seconds = (hundreds / 100).truncate();
-    String secondsStr = (seconds % 60).toString().padLeft(2, '0');
-    return ":$secondsStr";
   }
 }

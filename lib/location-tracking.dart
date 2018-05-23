@@ -9,7 +9,13 @@ class LocationTracking {
   static const BACKGROUND_USE = true;
 
   ///distance in meters between each Location updates
-  static const DISPLACEMENT = 5.0;
+  static const DISPLACEMENT = 20.0;
+
+  ///First location measurements are usually very inaccurate, because
+  ///device location service just started, we will skip measuring distance for
+  ///the following number of the first location results.
+  ///Note, that they will still be added to the locations array.
+  static const SKIP_FIRST_MEASUREMENTS = 0;
 
   static const ANDROID_PERMISSION = LocationPermissionAndroid.fine;
   static const IOS_PERMISSION = LocationPermissionIOS.always;
@@ -19,9 +25,13 @@ class LocationTracking {
   int _subscriptionStartedTimestamp;
   StreamSubscription<LocationResult> _subscription;
   List<LocationData> locations = [];
-  bool _isTracking = false;
+  LocationData lastLocation;
+  bool trackDistance = false;
+  bool isTrackingLocation = false;
   double distance = 0.0;
+  List<Function> _locationListeners = [];
   final Distance distanceCalculator = new Distance();
+
 
 
   LocationData createLocationData(result) {
@@ -31,7 +41,7 @@ class LocationTracking {
   }
 
   _updateDistance(LocationResult result1, LocationResult result2) {
-    if (result1.isSuccessful && result2.isSuccessful) {
+    if (trackDistance && result1.isSuccessful && result2.isSuccessful) {
       double segmentMeters = distanceCalculator(
           new LatLng(result1.location.latitude,result1.location.longitude),
           new LatLng(result2.location.latitude,result2.location.longitude)
@@ -41,20 +51,32 @@ class LocationTracking {
   }
 
   onLocationData(LocationResult result) {
-    if(locations.length>0) {
-      _updateDistance(result, locations[0].result);
+    if(lastLocation != null ) {
+      _updateDistance(result, lastLocation.result);
     }
-    locations.insert(0, createLocationData(result));
+    lastLocation = createLocationData(result);
+    for (var i = 0; i < _locationListeners.length; i++) {
+      if(_locationListeners[i] is Function){
+        _locationListeners[i](distance);
+      } else {
+        _locationListeners.removeAt(i);
+      }
+    }
   }
 
   dispose() {
     _subscription.cancel();
   }
 
-  isTracking() {
-    return _isTracking;
+  addLocationListener(Function callback){
+    if(_locationListeners.indexOf(callback) == -1){
+      _locationListeners.add(callback);
+    }
   }
 
+  removeLocationListener(Function callback){
+    _locationListeners.remove(callback);
+  }
 
   startRecordingLocation() {
     distance = 0.0;
@@ -67,9 +89,9 @@ class LocationTracking {
             inBackground: BACKGROUND_USE,
             permission: PERMISSION)
         .listen(onLocationData);
-    _isTracking = true;
+     isTrackingLocation = true;
     _subscription.onDone(() {
-      _isTracking = false;
+       isTrackingLocation = false;
       //TODO: add logic here when subscription is closed
     });
   }
@@ -78,7 +100,7 @@ class LocationTracking {
     _subscription.cancel();
     _subscription = null;
     _subscriptionStartedTimestamp = null;
-    _isTracking = false;
+     isTrackingLocation = false;
   }
 }
 
