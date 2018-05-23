@@ -15,3 +15,6 @@ android/
 endorphin.iml
 endorphin_android.iml
 pubspec.lock
+
+#exception for ios app setting file
+!ios/Runner/Info.plist
