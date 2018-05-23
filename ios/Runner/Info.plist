@@ -53,7 +53,9 @@
 	<array>
 		<string>location</string>
 	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
+	<key>NSLocationUsageDescription</key>
+	<string>To track distance of your run</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.sports</string>
 </dict>
 </plist>
