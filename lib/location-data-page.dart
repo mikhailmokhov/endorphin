@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:endorphin/location-tracking.dart';
+import 'package:endorphin/geolocation-tracking.dart';
 import 'package:geolocation/geolocation.dart';
 
 class LocationDataPage extends StatefulWidget {

@@ -3,7 +3,7 @@ import 'package:endorphin/settings-page.dart';
 import 'package:endorphin/timer-text-widget.dart';
 import 'dart:async';
 import 'package:endorphin/main.dart';
-import 'package:endorphin/location-tracking.dart';
+import 'package:endorphin/geolocation-tracking.dart';
 import 'package:endorphin/distance-text-widget.dart';
 
 Color statColor = Colors.black;

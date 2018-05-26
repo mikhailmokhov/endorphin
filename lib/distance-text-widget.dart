@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:endorphin/running-page.dart';
-import 'package:endorphin/location-tracking.dart';
+import 'package:endorphin/geolocation-tracking.dart';
 import 'dart:async';
 
 class DistanceText extends StatefulWidget {

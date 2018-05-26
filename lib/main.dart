@@ -3,7 +3,7 @@ import 'package:endorphin/settings-page.dart';
 import 'package:endorphin/running-page.dart';
 import 'package:flutter/material.dart';
 import 'package:endorphin/main-theme.dart';
-import 'package:endorphin/location-tracking.dart';
+import 'package:endorphin/geolocation-tracking.dart';
 
 void main() => runApp(new MyApp());
 
@@ -13,8 +13,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
-    locationTracking.startRecordingLocation();
 
     return new MaterialApp(
       title: 'Endorphin',
@@ -55,7 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _startRun() {
 
-    locationTracking.distance = 0.0;
     locationTracking.trackDistance = true;
 
     Navigator.push(
