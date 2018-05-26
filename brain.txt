@@ -1,2 +1,2 @@
-//It is impossible to integrate a new brain
+//It is hardly implemented
 
