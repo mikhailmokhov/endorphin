@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:endorphin/geolocation-tracking.dart';
 import 'package:geolocation/geolocation.dart';
+import 'location-data-class.dart';
 
 class LocationDataPage extends StatefulWidget {
   @override
@@ -15,7 +15,7 @@ class _LocationDataState extends State<LocationDataPage> {
 
     children.addAll(ListTile.divideTiles(
       context: context,
-      tiles: locationTracking.locations.map((location) => new _Item(data: location)).toList(),
+      tiles: [] //locationTracking.run.locationRecords.map((location) => new _Item(data: location)).toList(),
     ));
 
     return new Scaffold(

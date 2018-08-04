@@ -1,6 +1,8 @@
 import 'package:geolocation/geolocation.dart';
 import 'dart:async';
 import 'package:latlong/latlong.dart';
+import 'location-data-class.dart';
+import 'activity-class.dart';
 
 class GeoLocationTracking {
   static const LocationAccuracy ACCURACY = LocationAccuracy.best;
@@ -9,7 +11,7 @@ class GeoLocationTracking {
   static const BACKGROUND_USE = true;
 
   ///distance in meters between each Location updates
-  static const DISPLACEMENT = 1.0;
+  static const DISPLACEMENT = 25.0;
 
   ///First location measurements are usually very inaccurate, because
   ///device location service just started, we will skip measuring distance for
@@ -24,15 +26,15 @@ class GeoLocationTracking {
 
   int _subscriptionStartedTimestamp;
   StreamSubscription<LocationResult> _subscription;
-  List<LocationData> locations = [];
   LocationData lastLocation;
   bool trackDistance = false;
   bool isTrackingLocation = false;
   double distance = 0.0;
   List<Function> _locationListeners = [];
   final Distance distanceCalculator = new Distance();
+  Workout workout;
 
-  GeoLocationTracking(){
+  GeoLocationTracking(this.workout){
     startRecordingLocation();
   }
 
@@ -57,6 +59,7 @@ class GeoLocationTracking {
       _updateDistance(result, lastLocation.result);
     }
     lastLocation = createLocationData(result);
+    this.workout.locationRecords.add(lastLocation);
     for (var i = 0; i < _locationListeners.length; i++) {
       if(_locationListeners[i] is Function){
         _locationListeners[i](distance);
@@ -83,9 +86,9 @@ class GeoLocationTracking {
   startRecordingLocation() {
     distance = 0.0;
     _subscriptionStartedTimestamp = new DateTime.now().millisecondsSinceEpoch;
-    locations = [];
     _subscription = Geolocation
         .locationUpdates(
+            displacementFilter: DISPLACEMENT,
             accuracy: ACCURACY,
             inBackground: BACKGROUND_USE,
             permission: PERMISSION)
@@ -104,15 +107,3 @@ class GeoLocationTracking {
      isTrackingLocation = false;
   }
 }
-
-class LocationData {
-  LocationData({
-    this.result,
-    this.elapsedTimeSeconds,
-  });
-
-  final LocationResult result;
-  final int elapsedTimeSeconds;
-}
-
-GeoLocationTracking locationTracking = new GeoLocationTracking();

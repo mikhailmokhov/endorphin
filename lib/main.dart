@@ -1,101 +1,142 @@
-import 'package:flutter/cupertino.dart';
-import 'package:endorphin/settings-page.dart';
-import 'package:endorphin/running-page.dart';
+import 'package:endorphin/activity-summary-widget.dart';
+import 'package:endorphin/settings-class.dart';
+import 'package:endorphin/settings-widget.dart';
+
+//import 'package:endorphin/voice-generator-class.dart';
+//import 'package:endorphin/voice-statistic-class.dart';
 import 'package:flutter/material.dart';
-import 'package:endorphin/main-theme.dart';
+import 'package:endorphin/workout-widget.dart';
+import 'package:endorphin/activity-class.dart';
 import 'package:endorphin/geolocation-tracking.dart';
+import 'package:endorphin/common.dart';
 
-void main() => runApp(new MyApp());
+void main() => runApp(EndorphinApp());
 
-
-
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class EndorphinApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-
-    return new MaterialApp(
-      title: 'Endorphin',
-      theme: mainTheme,
-      home: new MyHomePage(),
-    );
-  }
+  EndorphinState createState() => EndorphinState();
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+class EndorphinState extends State<EndorphinApp> {
+  Settings settings;
+  Views currentView;
+  Workout workout;
+  GeoLocationTracking _geolocationTracking;
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title = "Endorphin";
+  //VoiceGenerator _voiceGenerator;
+  //VoiceStatistic _voiceStatistic;
 
   @override
-  _MyHomePageState createState() {
-    return new _MyHomePageState();
+  void initState() {
+    super.initState();
+    currentView = Views.run;
+    //_voiceGenerator =  VoiceGenerator();
+    //_voiceStatistic =  VoiceStatistic();
+    settings = Settings();
+    settings.loadFromSharedPreferences().then((settings) {
+      if (settings.startOnOpening) {
+        setState(() {
+          _startActivity();
+        });
+      } else {
+        setState(() {});
+      }
+    });
   }
-}
 
-class _MyHomePageState extends State<MyHomePage> {
-  void _openSettings() {
-    Navigator.push(
-        context,
-        new MaterialPageRoute(
-            builder: (BuildContext context) =>
-                new SettingsPage(title: "Settings")));
-  }
-
-  void _startRun() {
-
-    locationTracking.trackDistance = true;
-
-    Navigator.push(
-        context,
-        new MaterialPageRoute(
-            builder: (BuildContext context) => new RunningPage()));
-    // This call to setState tells the Flutter framework that something has
-    // changed in this State, which causes it to rerun the build method below
-    // so that the display can reflect the updated values. If we changed
-    // _counter without calling setState(), then the build method would not be
-    // called again, and so nothing would appear to happen.
+  _startActivity() {
+    workout = Workout(settings.activityType);
+    _geolocationTracking = GeoLocationTracking(workout);
+    _geolocationTracking.trackDistance = true;
+    _geolocationTracking.startRecordingLocation();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return new Scaffold(
-        appBar: new AppBar(
-            automaticallyImplyLeading: false,
-            // Here we take the value from the MyHomePage object that was created by
-            // the App.build method, and use it to set our appbar title.
-            title: new Text(widget.title),
-            actions: <Widget>[
-              new IconButton(
-                  onPressed: _openSettings, icon: new Icon(Icons.settings))
-            ]),
-        body: new Container(
-          child: new Center(
+    Widget currentWidget;
+    Brightness brightness;
+    if (settings.darkTheme) {
+      brightness = Brightness.dark;
+    } else {
+      brightness = Brightness.light;
+    }
+    var mainTheme = ThemeData(brightness: brightness);
+    Activity activity = settings.activityType;
+    switch (currentView) {
+      case Views.stat:
+        currentWidget = Center(
+            // Center is a layout widget. It takes a single child and positions it
+            // in the middle of the parent.
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+              Text("There is no data", style: TextStyle(fontSize: 29.0))
+            ]));
+        break;
+      case Views.run:
+        if (workout == null) {
+          currentWidget = Center(
               // Center is a layout widget. It takes a single child and positions it
               // in the middle of the parent.
-              child: new Column(
+              child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                new FlatButton(
-                    onPressed: _startRun,
-                    child:
-                        new Text("Start", style: new TextStyle(fontSize: 29.0)))
-              ])) /* add child content content here */,
-        ));
+                Expanded(
+                    child: FlatButton(
+                        onPressed: () {
+                          setState(() {
+                            _startActivity();
+                          });
+                        },
+                        child: Text("Tap anywhere to start",
+                            style: TextStyle(fontSize: 29.0))))
+              ]));
+        } else if (workout.endTime == null) {
+          currentWidget = WorkoutWidget(
+              workout: workout,
+              tracking: _geolocationTracking,
+              settings: settings,
+              onFinished: () {
+                setState(() {});
+              });
+        } else {
+          currentWidget = WorkoutSummary(workout: workout, settings: settings);
+        }
+        break;
+      case Views.settings:
+        currentWidget = SettingsWidget(
+            settings: settings,
+            onThemeChange: () {
+              setState(() {});
+            },
+            onActivityChange: () {
+              setState(() {});
+            });
+    }
+
+    return MaterialApp(
+      theme: mainTheme,
+      home: Scaffold(
+          body: currentWidget,
+          bottomNavigationBar: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              onTap: (int index) {
+                setState(() {
+                  currentView = Views.values[index];
+                });
+              },
+              currentIndex: currentView.index,
+              items: [
+                BottomNavigationBarItem(
+                    title: Text('Stats'), icon: Icon(Icons.content_paste)),
+                BottomNavigationBarItem(
+                    icon: Icon(activity.iconData),
+                    title: Text(workout != null
+                        ? activity.pluralName
+                        : activity.singularName)),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.settings), title: Text('Settings'))
+              ])),
+    );
   }
 }
